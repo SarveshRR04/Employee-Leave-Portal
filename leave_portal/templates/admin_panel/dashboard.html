@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="cards">
+  <div class="card"><div class="card-label">Employees</div><div class="card-value">{{ stats.employees }}</div></div>
+  <div class="card"><div class="card-label">Pending</div><div class="card-value">{{ stats.pending }}</div></div>
+  <div class="card"><div class="card-label">Approved</div><div class="card-value">{{ stats.approved }}</div></div>
+  <div class="card"><div class="card-label">Rejected</div><div class="card-value">{{ stats.rejected }}</div></div>
+</div>
+
+<div class="grid-2">
+
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Pending Requests</h2>
+      <a href="{% url 'leave_requests' %}?status=PENDING">View all &rarr;</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Employee</th><th>Type</th><th>Dates</th><th>Days</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for leave in pending_leaves %}
+            <tr>
+              <td><a href="{% url 'employee_detail' leave.employee.id %}">{{ leave.employee }}</a></td>
+              <td>{{ leave.leave_type }}</td>
+              <td>{{ leave.start_date|date:"d M" }} &ndash; {{ leave.end_date|date:"d M Y" }}</td>
+              <td>{{ leave.total_days }}</td>
+              <td>{% include "partials/leave_actions.html" %}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="empty">No pending requests.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="panel">
+    <div class="panel-header"><h2>Leave Status</h2></div>
+    <div class="panel-body"><div class="chart-box"><canvas id="statusChart"></canvas></div></div>
+  </div>
+</div>
+
+{% include "partials/reject_modal.html" %}
+{{ chart_data|json_script:"chart-data" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+
+  const data = JSON.parse(document.getElementById("chart-data").textContent);
+
+  new Chart(document.getElementById("statusChart"), {
+    type: "doughnut",
+    data: {
+      labels: ["Pending", "Approved", "Rejected"],
+      datasets: [{ data: data.status, backgroundColor: ["#d97706", "#16a34a", "#dc2626"] }],
+    },
+    options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } },
+  });
+</script>
+{% endblock %}

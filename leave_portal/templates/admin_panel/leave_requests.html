@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Leave Requests{% endblock %}
+{% block page_title %}Leave Requests{% endblock %}
+
+{% block content %}
+<div class="panel">
+  <div class="panel-body">{% include "partials/leave_filters.html" %}</div>
+</div>
+
+<div class="panel">
+  <div class="panel-header"><h2>{{ leaves|length }} request{{ leaves|length|pluralize }} found</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th>
+            <th>Reason</th><th>Status</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for leave in leaves %}
+          <tr>
+            <td><a href="{% url 'employee_detail' leave.employee.id %}">{{ leave.employee }}</a>
+                <div class="sub">{{ leave.employee.department }}</div></td>
+            <td>{{ leave.leave_type }}</td>
+            <td>{{ leave.start_date|date:"d M Y" }}</td>
+            <td>{{ leave.end_date|date:"d M Y" }}</td>
+            <td>{{ leave.total_days }}</td>
+            <td>
+              {{ leave.reason }}
+              {% if leave.admin_remark %}<div class="remark">Rejected: {{ leave.admin_remark }}</div>{% endif %}
+            </td>
+            <td>{% include "partials/status_badge.html" %}</td>
+            <td>
+              {% if leave.status == "PENDING" %}
+                {% include "partials/leave_actions.html" %}
+              {% else %}
+                <span class="sub">by {{ leave.reviewed_by|default:"-" }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="8" class="empty">No leave requests match your filters.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% include "partials/reject_modal.html" %}
+{% endblock %}

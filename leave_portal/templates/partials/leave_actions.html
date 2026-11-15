@@ -1,0 +1,10 @@
+{# Approve / Reject buttons for one pending leave. "next" brings the admin back to this page. #}
+<div class="actions">
+  <form method="post" action="{% url 'approve_leave' leave.id %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+  </form>
+  <button type="button" class="btn btn-danger btn-sm"
+          data-reject-url="{% url 'reject_leave' leave.id %}" data-employee="{{ leave.employee }}">Reject</button>
+</div>

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Apply Leave{% endblock %}
+{% block page_title %}Apply for Leave{% endblock %}
+
+{% block content %}
+<div class="panel narrow">
+  <div class="panel-header"><h2>Leave Application</h2></div>
+  <div class="panel-body">
+    <p class="muted">
+      Days left:
+      {% for b in balances %}{{ b.leave_type.name }} <strong>{{ b.remaining_days }}</strong>{% if not forloop.last %} &middot; {% endif %}{% endfor %}
+      <br>Days are deducted only after the admin approves.
+    </p>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error alert-static">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.leave_type.id_for_label }}">Leave Type</label>
+        {{ form.leave_type }}
+        {{ form.leave_type.errors }}
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="{{ form.start_date.id_for_label }}">Start Date</label>
+          {{ form.start_date }}
+          {{ form.start_date.errors }}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.end_date.id_for_label }}">End Date</label>
+          {{ form.end_date }}
+          {{ form.end_date.errors }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="{{ form.reason.id_for_label }}">Reason</label>
+        {{ form.reason }}
+        {{ form.reason.errors }}
+      </div>
+      <button type="submit" class="btn btn-primary">Submit Request</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

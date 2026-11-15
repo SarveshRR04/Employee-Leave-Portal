@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Employees{% endblock %}
+{% block page_title %}Employees{% endblock %}
+
+{% block content %}
+<div class="panel">
+  <div class="panel-header">
+    <form method="get" class="filters" style="flex: 1">
+      <div class="f wide">
+        <input type="search" name="q" value="{{ q }}" placeholder="Search by name, email, code or department">
+      </div>
+      <button type="submit" class="btn btn-primary">Search</button>
+      <a href="{% url 'employee_list' %}" class="btn btn-light">Reset</a>
+    </form>
+    <a href="/django-admin/leaves/user/add/" target="_blank" class="btn btn-light">Add Employee</a>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Employee</th><th>Department</th>
+          {% for t in leave_types %}<th>{{ t.name }} left</th>{% endfor %}
+          <th>Pending</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.employee }}<div class="sub">{{ row.employee.email }}</div></td>
+            <td>{{ row.employee.department|default:"-" }}</td>
+            {% for b in row.balances %}
+              <td>{{ b.remaining_days }} / {{ b.total_days }}</td>
+            {% endfor %}
+            <td>{{ row.employee.pending }}</td>
+            <td><a href="{% url 'employee_detail' row.employee.id %}">History</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="10" class="empty">No employees found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

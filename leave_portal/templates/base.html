@@ -1,0 +1,66 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Leave Portal{% endblock %} | LeaveDesk</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+{% if user.is_authenticated %}
+{% with url_name=request.resolver_match.url_name %}
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">LeaveDesk</div>
+
+    <nav class="nav">
+      {% if user.is_admin %}
+        <a href="{% url 'admin_dashboard' %}" class="{% if url_name == 'admin_dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="{% url 'leave_requests' %}" class="{% if url_name == 'leave_requests' %}active{% endif %}">
+          Leave Requests
+          <span id="pending-badge" data-url="{% url 'pending_count_api' %}"
+                class="badge-count {% if not pending_count %}hidden{% endif %}">{{ pending_count }}</span>
+        </a>
+        <a href="{% url 'employee_list' %}" class="{% if url_name == 'employee_list' or url_name == 'employee_detail' %}active{% endif %}">Employees</a>
+        <a href="{% url 'reports' %}" class="{% if url_name == 'reports' %}active{% endif %}">Reports</a>
+        <a href="/django-admin/" target="_blank">Manage Users</a>
+      {% else %}
+        <a href="{% url 'employee_dashboard' %}" class="{% if url_name == 'employee_dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="{% url 'apply_leave' %}" class="{% if url_name == 'apply_leave' %}active{% endif %}">Apply Leave</a>
+        <a href="{% url 'my_leaves' %}" class="{% if url_name == 'my_leaves' %}active{% endif %}">My Leaves</a>
+      {% endif %}
+    </nav>
+
+    <form method="post" action="{% url 'logout' %}" class="logout">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Open menu">&#9776;</button>
+      <h1>{% block page_title %}{% endblock %}</h1>
+      <span class="user">{{ user.get_full_name|default:user.email }} ({{ user.get_role_display }})</span>
+    </header>
+
+    <main class="content">
+      {% include "partials/messages.html" %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endwith %}
+
+{% else %}
+  {% block auth_content %}{% endblock %}
+{% endif %}
+
+{% block extra_js %}{% endblock %}
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

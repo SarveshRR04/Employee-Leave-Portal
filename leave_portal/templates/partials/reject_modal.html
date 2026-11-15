@@ -1,0 +1,20 @@
+{# Popup asking for the rejection reason. main.js opens it and sets the form action. #}
+<div class="modal" id="reject-modal">
+  <div class="modal-box">
+    <h3>Reject leave request</h3>
+    <p class="muted">Employee: <strong id="reject-employee"></strong></p>
+    <form method="post" id="reject-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div class="form-group">
+        <label for="reject-reason">Reason for rejection</label>
+        <textarea id="reject-reason" name="reason" rows="3" required
+                  placeholder="e.g. Project deadline that week"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-light" data-close-modal>Cancel</button>
+        <button type="submit" class="btn btn-danger">Reject</button>
+      </div>
+    </form>
+  </div>
+</div>
